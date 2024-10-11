@@ -18,10 +18,11 @@ jobs:
         with:
           host: 52.76.3.196
           username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}  # Correct reference to the secret
+          key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
             sudo apt update
             sudo apt install -y nginx
             sudo systemctl start nginx
             sudo systemctl enable nginx
+          debug: true
