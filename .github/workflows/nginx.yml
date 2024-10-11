@@ -23,9 +23,15 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > private_key
           chmod 600 private_key
+          # Debugging: Print SSH command to check variables
+          echo "Attempting to SSH into $HOSTNAME as $USER_NAME"
+          
+          # Use the correct SSH command
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} << 'EOF'
+            # Print the Nginx service status to check if the installation was successful
             sudo apt update
             sudo apt install -y nginx
             sudo systemctl start nginx
             sudo systemctl enable nginx
+            sudo systemctl status nginx  # Check the status of Nginx service
           EOF
