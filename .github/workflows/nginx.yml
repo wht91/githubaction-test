@@ -6,20 +6,17 @@ on:
       - main
 
 jobs:
-  deploy:
+  Deploy:
+    name: Deploy to EC2
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install Nginx on EC2 via SSH
-        uses: appleboy/ssh-action@v0.1.12
-        with:
-          host: 52.76.3.196
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
+      - uses: actions/checkout@v2 
+      - name: Build & Deploy
+        env:
+            PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+            HOSTNAME: ${{secrets.SSH_HOST}}
+            USER_NAME: ${{secrets.USER_NAME}}
           script: |
             sudo apt update
             sudo apt install -y nginx
