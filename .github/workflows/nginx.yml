@@ -1,7 +1,7 @@
 name: Install Nginx on EC2
 
 on: 
-  push:           # This workflow will run on every push to the repository
+  push:
     branches: 
       - main
 
@@ -10,20 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository (though not mandatory for this task)
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Setting up SSH access to the EC2 instance
       - name: Install Nginx on EC2 via SSH
-        uses: appleboy/ssh-action@v0.1.8    # Use SSH Action to run commands on EC2
+        uses: appleboy/ssh-action@v0.1.8
         with:
-          host: 52.76.3.196                 # Public IP of your EC2 instance
-          username: ubuntu                  # Default username for EC2 (change if necessary)
-          key: ${{ secrets.Github_Action.EC2_SSH_KEY }}   # Access the private SSH key from the 'Github Action' environment secret
+          host: 52.76.3.196
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}  # Correct reference to the secret
           port: 22
           script: |
-            sudo apt update                 # Update the package list
-            sudo apt install -y nginx       # Install Nginx
-            sudo systemctl start nginx      # Start Nginx service
-            sudo systemctl enable nginx     # Enable Nginx to start on boot
+            sudo apt update
+            sudo apt install -y nginx
+            sudo systemctl start nginx
+            sudo systemctl enable nginx
