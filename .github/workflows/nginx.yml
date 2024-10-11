@@ -1,7 +1,7 @@
 name: Setup EC2 Instance with Nginx
 
 on:
-  push:           # Trigger on every push to the main branch
+  push:           
     branches:
       - main
 
@@ -16,9 +16,9 @@ jobs:
 
       # Step to start the AWS EC2 instance
       - name: Start AWS EC2
-        id: start_ec2
         run: |
           instance_id="${{ secrets.AWS_EC2_INSTANCE_ID }}"
+          echo "Starting EC2 Instance: $instance_id"
           aws ec2 start-instances --instance-ids "$instance_id"
           echo "Started EC2 Instance: $instance_id"
         env:
@@ -26,10 +26,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
 
-      # Step to create an EC2 instance with user data to install Nginx
-      - name: Install Nginx via User Data
+      # Step to install Nginx via User Data
+      - name: Install Nginx
         run: |
           instance_id="${{ secrets.AWS_EC2_INSTANCE_ID }}"
+          echo "Installing Nginx on EC2 Instance: $instance_id"
           user_data='#!/bin/bash
             sudo apt update
             sudo apt install -y nginx
@@ -37,7 +38,7 @@ jobs:
             sudo systemctl enable nginx'
           
           # Run the user data script
-          aws ec2 modify-instance-attribute --instance-id "$instance_id" --user-data "Value=$(echo $user_data | base64)"
+          aws ec2 modify-instance-attribute --instance-id "$instance_id" --user-data "Value=$(echo "$user_data" | base64)"
           echo "Nginx installation commands set in user data for instance: $instance_id"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
