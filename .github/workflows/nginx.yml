@@ -11,9 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v3  # Update to v3
+      - uses: actions/checkout@v3
 
-      - name: Debug Secrets
+      - name: Debug Secrets (Optional)
+        if: always()  # Run even if the workflow fails
         run: |
           echo "SSH_PRIVATE_KEY: '${{ secrets.SSH_PRIVATE_KEY }}'"
           echo "SSH_HOST: '${{ secrets.SSH_HOST }}'"
@@ -25,10 +26,11 @@ jobs:
           HOSTNAME="${{ secrets.SSH_HOST }}"
           USER_NAME="${{ secrets.USER_NAME }}"
           
+          # Save private key to a file and set the correct permissions
           echo "$PRIVATE_KEY" > private_key
           chmod 600 private_key
-          echo "Attempting to SSH into $HOSTNAME as $USER_NAME"
           
+          # Attempt to SSH and install Nginx
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} << 'EOF'
             sudo apt update
             sudo apt install -y nginx
@@ -36,3 +38,6 @@ jobs:
             sudo systemctl enable nginx
             sudo systemctl status nginx
           EOF
+
+          # Remove the private key after use for security
+          rm -f private_key
